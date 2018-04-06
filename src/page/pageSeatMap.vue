@@ -1,15 +1,31 @@
 <template>
     <section v-loading="loading">
         <el-header>
+            <el-button @click="$router.back()" type="primary" class="btnBack" icon="el-icon-back"></el-button>
             选座
+            <el-button :disabled="dialogVisible||selected.length<1" type="primary" class="btnSubmit" icon="el-icon-check">提交 </el-button>
         </el-header>
-        <div class="my-ticket">
-
+        <div class="diaLogBox el-dialog" v-if="dialogVisible">
+            <div class="el-dialog__header"><span class="el-dialog__title">选座指南</span></div>
+            <div class="el-dialog__body">
+                <ol>
+                <li>系统暂不支持为多张票同时选座</li>
+                <li>选座并确认后不可更改</li>
+                <li>只允许选取票种对应的座位</li>
+                <li>座位图可以左右滑动</li>
+                <li>再次点击已选座位可以取消</li>
+            </ol>
+            </div>
+            <div class="el-dialog__footer">
+                <span class="dialog-footer">
+                    <el-button type="primary" @click="dialogVisible = false">我明白了，开始选座</el-button>
+                </span>
+            </div>
         </div>
-        <div class="seatmap-box" >
+        <div class="seatmap-box" v-show="!dialogVisible">
             <div class="seatMap seatYZ" :style="{zoom:appZoom}" v-cloak>
                 <div :key="'line-'+a" class="line" v-for="(i,a) in seatMap" :dkey="(21-a)+'-'">
-                    <div :key="'seat-'+a+'-'+(ii==''?Math.random():(ii+'-'+aa))" v-for="(ii,aa) in i" @click="ii!=''&&handleClick($event.target.dataset.key)" :class="{seat:!isNaN(ii)&&ii!=='',space:ii=='',seatA:isSeatA(21-a,ii,aa,a),booked:ii!=''&&alreadyBooked.indexOf(21-a+'-'+ii)!=-1,selected:ii!=''&&selected.indexOf(21-a+'-'+ii)!=-1}" :data-key="(21-a)+'-'+(ii==''?'space':ii)">
+                    <div :key="'seat-'+a+'-'+(ii==''?Math.random():(ii+'-'+aa))" v-for="(ii,aa) in i" @click="ii!=''&&handleClick($event.target.dataset.key,21-a,ii,aa,a)" :class="{seat:!isNaN(ii)&&ii!=='',space:ii=='',seatA:isSeatA(21-a,ii,aa,a),booked:ii!=''&&alreadyBooked.indexOf(21-a+'-'+ii)!=-1,selected:ii!=''&&selected.indexOf(21-a+'-'+ii)!=-1}" :data-key="(21-a)+'-'+(ii==''?'space':ii)">
                         {{ii==''?'&nbsp;':ii}}
                     </div>
                 </div>
@@ -36,9 +52,17 @@
 <script>
 export default {
     data:function(){
-        var z=(window.outerHeight-100)/805;
-        console.log(z)
+        var that=this;
+        try{
+        var z=(document.querySelector(".el-main").clientHeight-70)/805;
+        }catch(e){
+            z=1;
+            setTimeout(function(){
+                that.appZoom=(document.querySelector(".el-main").clientHeight-70)/805;
+            },0);
+        }
         return {
+            dialogVisible:true,
             isVip:0,
         appZoom:z,
         loading:false,
@@ -82,12 +106,23 @@ export default {
                 while(a[0]!=''){ix++;a.shift();}
                 if(key>ix)return  false;
                 return true;
-            },handleClick:function(n,i,ii){
+            },handleClick:function(n,line,v,key,rLine){
                 if(this.alreadyBooked.indexOf(n)!=-1)return;
                 var a=this.selected.indexOf(n);
                 if(a!=-1)return this.selected.splice(a,1);
                 if(this.selected.length>0)return this.$message({
                     message: '别太贪心哪，只能选一个的',
+                    type: 'warning',
+                    center: true,
+                });
+                var isSeatA=this.isSeatA(line,v,key,rLine)
+                if(this.isVip==0&&isSeatA==true)return this.$message({
+                    message: '还需要多多氪金！',
+                    type: 'warning',
+                    center: true,
+                });
+                if(this.isVip==1&&isSeatA==false)return this.$message({
+                    message: '您可是高贵的VIP用户！',
                     type: 'warning',
                     center: true,
                 });
@@ -97,6 +132,11 @@ export default {
 }
 </script>
 <style>
+.diaLogBox{
+    width:400px;
+    max-width: 100%;
+    margin: 0 auto;
+}
 .space,.seat {
     display: inline-block;
     width: 30px;
