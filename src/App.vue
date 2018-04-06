@@ -6,7 +6,7 @@
                     <transition name="slide-fade">
                         <router-view></router-view>
                     </transition>
-                    <el-header>加载中</el-header>
+                    <el-header><i class="el-icon-loading"></i> 加载中</el-header>
                 </div>
             </el-main>
         </el-container>

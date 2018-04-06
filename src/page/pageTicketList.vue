@@ -2,8 +2,9 @@
     <section class="tkList">
         <el-header>
             卡包
+            <el-button @click="$router.push('/add')" type="primary" class="btnSubmit" icon="el-icon-plus">门票激活</el-button>
         </el-header>
-        <div class="packets item" @click="$router.push({path:'/ticket/'+i.ticket+(i.seat?'':'/seat')})" v-for="(i,a) in tickets" :key="a+'-'+i.id">
+        <div class="packets item" @click="$router.push({path:'/ticket/'+i.ticket+(i.seat?'':'/seat?level='+i.level)})" v-for="(i,a) in tickets" :key="a+'-'+i.id">
             <img src="../assets/img/ticket.png">
             <div class="center">
                 <h2>{{i.seat?'#'+i.seat:"未选座"}}</h2>

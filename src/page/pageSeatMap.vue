@@ -3,7 +3,7 @@
         <el-header>
             <el-button @click="$router.back()" type="primary" class="btnBack" icon="el-icon-back"></el-button>
             选座
-            <el-button :disabled="dialogVisible||selected.length<1" type="primary" class="btnSubmit" icon="el-icon-check">提交 </el-button>
+            <el-button :disabled="dialogVisible||selected.length<1" @click="submitSeat" type="primary" class="btnSubmit" icon="el-icon-check">提交 </el-button>
         </el-header>
         <div class="diaLogBox el-dialog" v-if="dialogVisible">
             <div class="el-dialog__header"><span class="el-dialog__title">选座指南</span></div>
@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import ajax from 'djax';
 export default {
     data:function(){
         var that=this;
@@ -63,7 +64,7 @@ export default {
         }
         return {
             dialogVisible:true,
-            isVip:0,
+            isVip:this.$route.query.level=="vip",
         appZoom:z,
         loading:false,
             seatMap:[
@@ -112,23 +113,57 @@ export default {
                 if(a!=-1)return this.selected.splice(a,1);
                 if(this.selected.length>0)return this.$message({
                     message: '别太贪心哪，只能选一个的',
-                    type: 'warning',
+                    type: 'info',
                     center: true,
                 });
                 var isSeatA=this.isSeatA(line,v,key,rLine)
                 if(this.isVip==0&&isSeatA==true)return this.$message({
                     message: '还需要多多氪金！',
-                    type: 'warning',
+                    type: 'info',
                     center: true,
                 });
                 if(this.isVip==1&&isSeatA==false)return this.$message({
                     message: '您可是高贵的VIP用户！',
-                    type: 'warning',
+                    type: 'info',
                     center: true,
                 });
                 this.selected.push(n);
+            },submitSeat:function(){
+                var that=this;
+                ajax({
+                    url:$API+'seat/choose/'+this.$route.params.id,
+                    data:{seat:this.selected[0]},
+                    xhrFields: {withCredentials: true},
+                }).done(function(e){
+                    that.$message({
+                        message: '选座成功！',
+                        type: 'success',
+                        center: true,
+                    });
+                    that.$router.push("/home");
+                }).fail(function(e,f,g){
+                    try{
+                        var j=JSON.parse(g);
+                        that.$alert(j.text||j.msg||"未知错误"+g, '选座失败');
+                    }catch(e){
+                        that.$alert('是我服务器炸了，还是你网络连不上了？', '网络错误');
+                    }
+                })
             }
+        },created () {
+            updateData(this);
         },
+        beforeRouteUpdate (to, from, next) {
+            updateData(this);
+        },
+}
+function updateData(that){
+    ajax({
+        url:$API+'seat/occupied',
+        xhrFields: {withCredentials: true},
+    }).done(function(e){
+        that.alreadyBooked=e.data;
+    })
 }
 </script>
 <style>
