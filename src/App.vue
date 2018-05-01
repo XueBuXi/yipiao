@@ -19,20 +19,26 @@ import ajax from 'djax';
 export default {
     methods: {
 
+    },
+    created:function(){
+        var that=this;
+        ajax({
+            url:$API+"user/status",
+            xhrFields: {withCredentials: true},
+        }).done(function(e){
+            if(e.url)location.href=e.url;
+            else if(that.$route.path=="/")that.$router.push("/home");
+        }).fail(function(){
+
+        })
     }
 } 
-ajax({
-    url:$API+"user/status",
-    xhrFields: {withCredentials: true},
-}).done(function(e){
-    if(e.url)location.href=e.url;
-}).fail(function(){
-
-})
 </script>
 
 <style>
-
+.el-message-box.alertBox {
+    max-width: 90%;
+}
 html,body{
     overflow: hidden;
     height:100%;
@@ -115,6 +121,12 @@ main>div>section {
 .el-header .btnSubmit{
     float: right;
     border-left: 1px solid #fff;
+    border-radius: 0;
+    height: 100%;
+}
+.el-header .btnSLeft{
+    float: left;
+    border-right: 1px solid #fff;
     border-radius: 0;
     height: 100%;
 }

@@ -35,7 +35,7 @@ module.exports = (options = {}) => ({
           loader: 'url-loader',
           options: {
             limit: 1024,
-            publicPath:"./dist/",
+            //publicPath:"./dist/",
             name:"static.[name].[ext]?[hash:20]"
           }
         }]

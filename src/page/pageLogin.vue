@@ -24,7 +24,7 @@ export default {
     },
 }
 function updateData(that){
-    that.$router.push("/home");
+    
 }
 </script>
 

@@ -25,7 +25,7 @@
         <div class="seatmap-box" v-show="!dialogVisible">
             <div class="seatMap seatYZ" :style="{zoom:appZoom}" v-cloak>
                 <div :key="'line-'+a" class="line" v-for="(i,a) in seatMap" :dkey="(21-a)+'-'">
-                    <div :key="'seat-'+a+'-'+(ii==''?Math.random():(ii+'-'+aa))" v-for="(ii,aa) in i" @click="ii!=''&&handleClick($event.target.dataset.key,21-a,ii,aa,a)" :class="{seat:!isNaN(ii)&&ii!=='',space:ii=='',seatA:isSeatA(21-a,ii,aa,a),booked:ii!=''&&alreadyBooked.indexOf(21-a+'-'+ii)!=-1,selected:ii!=''&&selected.indexOf(21-a+'-'+ii)!=-1}" :data-key="(21-a)+'-'+(ii==''?'space':ii)">
+                    <div :key="'seat-'+a+'-'+(ii==''?(aa+'-empty-'+a):(ii+'-'+aa))" v-for="(ii,aa) in i" @click="ii!=''&&handleClick($event.target.dataset.key,21-a,ii,aa,a)" :class="{seat:!isNaN(ii)&&ii!=='',space:ii=='',seatA:isSeatA(21-a,ii,aa,a),booked:ii!=''&&alreadyBooked.indexOf(21-a+'-'+ii)!=-1,selected:ii!=''&&selected.indexOf(21-a+'-'+ii)!=-1}" :data-key="(21-a)+'-'+(ii==''?'space':ii)">
                         {{ii==''?'&nbsp;':ii}}
                     </div>
                 </div>
@@ -53,6 +53,7 @@
 import ajax from 'djax';
 export default {
     data:function(){
+        window.seatACache=[];
         var that=this;
         try{
         var z=(document.querySelector(".el-main").clientHeight-70)/805;
@@ -67,6 +68,7 @@ export default {
             isVip:this.$route.query.level=="vip",
         appZoom:z,
         loading:false,
+            seatACache:[],
             seatMap:[
 ['','',44,42,40,38,36,34,32,30,28,26,24,22,20,18,'','','','','','','',16,14,12,10,8,6,4,2,1,3,'','','','','','','','','',5,7,9,11,13,15,17,19,21,23,25,27,31,33,35,37,39,41,43,'','','',''],
 ['',58,56,54,52,50,48,46,44,42,40,38,36,34,32,30,'',28,26,24,22,20,18,16,14,12,10,8,6,4,2,1,3,5,7,9,11,13,15,17,'',19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,54,55,57,59,'',''],
@@ -98,6 +100,8 @@ export default {
             isSeatA:function(line,v,key,rLine){
                 if(v=='')return false;
                 if(line>13)return false;
+                var ckey=[line,v,key,rLine].join("-");
+                if(window.seatACache.indexOf(ckey)!==-1)return true;
                 var a=this.seatMap[rLine].concat(['']);
                 var ix=0;
                 while(a[0]==''){ix++;a.shift();}
@@ -106,12 +110,13 @@ export default {
                 while(a[0]==''){ix++;a.shift();}
                 while(a[0]!=''){ix++;a.shift();}
                 if(key>ix)return  false;
+                window.seatACache.push(ckey);
                 return true;
             },handleClick:function(n,line,v,key,rLine){
-                if(this.alreadyBooked.indexOf(n)!=-1)return;
+                if(this.alreadyBooked.indexOf(n)!=-1)return false;
                 var a=this.selected.indexOf(n);
                 if(a!=-1)return this.selected.splice(a,1);
-                if(this.selected.length>0)return this.$message({
+                if(this.selected.length!=0)return this.$message({
                     message: '别太贪心哪，只能选一个的',
                     type: 'info',
                     center: true,
@@ -265,11 +270,12 @@ function updateData(that){
     left: 30px;
     bottom: 90px;
     text-align: left;
+    z-index: -1;
 }
 .example .seat{
     text-align: center;
 }
 .el-message {
     margin-top: 30px;
-}
+} 
 </style>
