@@ -14,7 +14,8 @@
 </template>
 
 <script>
-window.$API="https://in1z.e123.pw/yipiao/?api/";
+window.$SVR="https://in1z.e123.pw/yipiao/?";
+window.$API=$SVR+"api/";
 import ajax from 'djax';
 export default {
     methods: {

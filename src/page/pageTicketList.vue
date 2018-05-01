@@ -12,7 +12,7 @@
             还没有票？请<a @click="gogoupiao" href="javascript:">点击购买</a>
             </el-card>
         </div>
-        <el-button style="display:block;margin:0 auto;" @click.native="gozzs" size="small">查看更多活动 | SPARK网络公益——线上支教</el-button>
+        <!--el-button style="display:block;margin:0 auto;" @click.native="gozzs" size="small">查看更多活动 | SPARK网络公益——线上支教</el-button-->
         <div class="packets item" @click="$router.push({path:'/ticket/'+i.ticket+(i.seat||i.level=='normal'?'':'/seat?level='+i.level)})" v-for="(i,a) in tickets" :key="a+'-'+i.id">
             <img src="../assets/img/ticket.png">
             <div class="center">
@@ -41,11 +41,11 @@ export default {
         }
     },
     methods: {
-        gozzs(){window.location.href='http://mp.weixin.qq.com/s/mfi0in5GqMy3PbXvGJVG7A'},
+        //gozzs(){window.location.href='http://mp.weixin.qq.com/s/mfi0in5GqMy3PbXvGJVG7A'},
         gogoupiao(){
             app.$confirm("在线支付仅支持购买普通票，<br/>若金额出现几分钱的随机尾数，请照常支付。此功能用于防止购票冲突，给您带来的不便敬请谅解","温馨提示",
             {dangerouslyUseHTMLString:true,customClass:"alertBox",confirmButtonText:"购买普通票"}).then(function(){
-                location.href="https://in1z.e123.pw/yipiao/?pay/go/50"
+                location.href=window.$SVR+"pay/go/50"
             }) 
         }
     },created () {

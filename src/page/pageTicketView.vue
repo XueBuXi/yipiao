@@ -20,7 +20,7 @@
                     <div>
                         <el-alert v-if="i.status=='use'" center :closable="false" title="已入场使用" type="error" show-icon></el-alert>
                         <el-alert v-if="i.status=='active'" center :closable="false" :title="(i.type=='offline'?'线下':'线上')+'票 / 可用'" type="success" show-icon></el-alert>
-                        <qrcode :value="'https://in1z.e123.pw/yipiao/?qr/'+i.ticket+'@'+i.tpass" :options="{ size: 128 }"></qrcode>
+                        <qrcode :value="qrBase+'qr/'+i.ticket+'@'+i.tpass" :options="{ size: 128 }"></qrcode>
                         <span class="ticket-no">{{i.ticket}}@{{i.tpass}}</span>
                     </div>
                 </el-card>
@@ -70,6 +70,7 @@ export default {
             },0);
         }
         return {
+            qrBase:window.$SVR,
             seatVisible:false,
             loading:false,
             appZoom:z,
